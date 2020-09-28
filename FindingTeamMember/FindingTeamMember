@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <map>
+
+using namespace std;
+
+vector<int> teamsFunc(vector<map<int,pair<int,int>>> &vec, int teams){
+    vector<int> res;
+    res.resize(teams*2);
+    int max = 0;
+    bool zeroIsAvailable = true;
+    pair<int,int> pair = {0,0};
+    
+    for(int j=0;j<teams;j++){
+        for(int i=0;i<vec.size();i++){
+        if(!vec[i].empty() && vec[i].rbegin()->first > max){
+            int ind = vec[i].rbegin()->second.second;
+            while((ind-1 >= 0 && vec[ind-1].empty()) || (ind==0 && zeroIsAvailable==false)){
+                int val = vec[i].rbegin()->first;
+                vec[i].erase(val);
+                if(vec[i].empty()){
+                    std::pair<int,std::pair<int,int>> coppia = make_pair(0,make_pair(0,0));
+                    vec[i].insert(coppia);
+                    break;
+                }
+                ind = vec[i].rbegin()->second.second;
+            } 
+        }
+        
+        if(!vec[i].empty() && vec[i].rbegin()->first > max){
+            max = vec[i].rbegin()->first;
+            pair = vec[i].rbegin()->second;
+            }
+
+        }
+
+    res[pair.first] = pair.second+1;
+    res[pair.second] = pair.first+1;
+    if(pair.first!=0) vec[pair.first-1].clear();
+    if(pair.second!=0) vec[pair.second-1].clear();
+    if(pair.first==0 || pair.second==0) zeroIsAvailable=false;
+    max = 0;
+
+}
+
+   return res;
+}
+
+int main(int argc, char *argv[]) {
+    int teams;
+    cin >> teams;
+    vector<map<int,pair<int,int>>> vector;
+    for(int i=0;i<(2*teams-1);i++){
+        map<int,pair<int,int>> tmp;
+        vector.push_back(tmp);
+    }
+    int el = 1;
+    int mate = 0;
+    for(int i=0;i<2*teams-1;i++){
+        for(int j=0;j<el;j++){
+            int tmp;
+            cin >> tmp;
+            pair<int,pair<int,int>> coppia = make_pair(tmp,make_pair(i+1,mate));
+            vector[i].insert(coppia);
+            mate++;
+        }
+        mate=0;
+        el++;
+    }
+
+    std::vector<int> result = teamsFunc(vector,teams);
+    for(auto &e : result){
+        cout << e << " ";
+    }
+    cout << endl;
+
+	return 0;
+    
+}
