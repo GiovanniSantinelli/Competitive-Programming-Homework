@@ -1,0 +1,96 @@
+#include <iostream>
+#include <vector> 
+
+using namespace std;
+
+long long inversions = 0;
+
+void Merge(int *a, int low, int high, int mid)
+{
+	
+	int i, j, k, temp[high-low+1];
+	i = low;
+	k = 0;
+	j = mid + 1;
+ 
+	// Merge the two parts into temp[].
+	while (i <= mid && j <= high)
+	{
+		if (a[i] < a[j])
+		{
+            temp[k] = a[i];
+			k++;
+			i++;
+		}
+		else 
+        /*If the minimum is in the right array, then we'll have a number of inversions equal to the number of elements in the 
+        remaining part of the left array. */
+		{
+            inversions += mid + 1 - i;
+			temp[k] = a[j];
+			k++;
+			j++;
+		}
+	}
+ 
+	// Insert all the remaining values from i to mid into temp[].
+	while (i <= mid)
+	{
+		temp[k] = a[i];
+		k++;
+		i++;
+	}
+ 
+	// Insert all the remaining values from j to high into temp[].
+	while (j <= high)
+	{   
+		temp[k] = a[j];
+		k++;
+		j++;
+	}
+ 
+	// Assign sorted data stored in temp[] to a[].
+	for (i = low; i <= high; i++)
+	{
+		a[i] = temp[i-low];
+	}
+}
+ 
+void MergeSort(int *a, int low, int high)
+{
+	int mid;
+	if (low < high)
+	{
+		mid=(low+high)/2;
+		MergeSort(a, low, mid);
+		MergeSort(a, mid+1, high);
+		Merge(a, low, high, mid);
+	}
+}
+
+int main(int argc, char *argv[]) {
+    int n;
+    int tests;
+    cin >> tests;
+    vector<long long> result;
+    result.reserve(tests);
+
+    for(int j=0;j<tests;++j){
+
+        cin >> n;
+        int arr[n];
+	        for(int i=0;i<n;++i){
+                cin >> arr[i];
+            }
+	    MergeSort(arr, 0, n-1);
+        result.push_back(inversions);
+        inversions = 0;
+    }
+
+    for(auto &e : result){
+        cout << e << endl;
+    }
+ 
+	return 0;
+    
+}
