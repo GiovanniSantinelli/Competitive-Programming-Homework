@@ -1,0 +1,50 @@
+#include <iostream>
+#include <vector>
+#include <deque>
+using namespace std;
+
+/*For each element given in input, we keep track of its value and its position in the input array. Then we try to insert it in the deque, that is ordered from the largest to
+the smallest. Each time we find a smaller element we delete it, and we update its input position in the result vector with the value of the element who deleted it. The result
+vector is initialized with all -1, that is the value that fit if no NextLargerElement is meet. Furthermore for each element we delete from the deque, we keep track of the 
+greater element who deleted it, that is its NextGreaterElement and we update the corresponding position in the result vector.
+Talking about the complexity, we have an outer loop that interate once for each element, so we have N iterations where each time we call "NextLargerElement" that makes a pop
+from the deque for each smaller element. We can have at most N pop at each iteration so it may seem that the cost is O(n^2), but since we can't have an overall number of pop
+that is greater than N and since each pop is done in costant time, we'll have O(n) amortized time.
+*/
+
+void nextLargerElement(deque<pair<long long,long long>> &vec,pair<long long,long long> val, vector<long long> &results){
+    while( !vec.empty() && vec.back().second <= val.second){
+        results[vec.back().first] = val.second;
+        vec.pop_back();
+    }
+    vec.push_back(val);
+}
+
+int main() {
+	long long tests;
+	cin >> tests;
+    vector<vector<long long>> results;
+
+	for(int i=0;i<tests;++i){
+	    long long dim;
+	    cin >> dim;
+	    deque<pair<long long,long long>> vec;
+        vector<long long> tmpResult(dim,-1);
+
+	    for(long long j=0;j<dim;++j){
+	        long long tmp;
+	        cin >> tmp;
+	        nextLargerElement(vec,make_pair(j,tmp),tmpResult);   
+	    }
+        results.push_back(tmpResult);
+	}
+
+
+    for(auto &vec : results){
+        for(auto &elem : vec){
+            cout << elem << " ";
+        }
+        cout << endl;
+    }
+	return 0;
+}
