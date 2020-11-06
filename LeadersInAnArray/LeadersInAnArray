@@ -1,0 +1,20 @@
+/* Just check the input array in reverse order keeping track of the larger elemente already visisted, in such a way that each new element must be smaller
+than the larger element saved in order to be a "leader". Complexity is O(n) since we just scan once the array from the back to the head.*/
+
+vector<int> leaders(int arr[], int n){
+    
+    vector<int> res;
+
+    res.push_back(arr[n-1]);
+    int max = arr[n-1];
+
+    for(int i = n-2; i>=0 ; --i){
+        if (arr[i] >= max){
+            res.push_back(arr[i]);
+            if(arr[i] > max) max = arr[i];
+        }
+    }
+
+    reverse(res.begin(),res.end());
+    return res;
+}
