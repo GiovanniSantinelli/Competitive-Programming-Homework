@@ -1,0 +1,108 @@
+/*
+Using a segment tree we just need to record for every elements, how many elemets are smallar than it (that means they have a smallar value, and a smallare index) and how many
+elements are larger than it (that means they have a larger value and a larger index). After doing that we can simply multiply the number of elements smaller than a certain index
+and the number of elements larger than the same index to get the number of triples (i.e. combinations) it has. So we record a segment tree in which in each "children" we have
+a vector of nodes, where each node is a struct containing exactly a value, the number of larger nodes and smaller nodes.
+*/
+
+#include<iostream>
+#include<algorithm>
+#include<string.h>
+#include<math.h> 
+#include<vector>
+
+#define MAX 10000 * 4 
+
+using namespace std;
+
+size_t N;
+
+struct Node{
+    int value;
+    int largerNodes = 0;
+    int lowerNodes = 0; //smaller nodes.
+};
+
+
+
+vector<vector<Node>> tree {MAX,vector<Node>(N)};
+
+/**
+ * Build and init tree
+ */
+void build_tree(int node, int a, int b, vector<int> &arr) {
+  	if(a > b) return; // Out of range
+  	
+  	if(a == b) { // Leaf node
+            vector<Node> vec;
+            Node leaf {arr[a]};  // Init value
+            vec.push_back(leaf);
+            tree[node] = move(vec);
+		return;
+	}
+	
+	build_tree(node*2, a, (a+b)/2, arr); // Init left child
+	build_tree(node*2+1, 1+(a+b)/2, b, arr); // Init right child
+
+    for(int k = 0; k < tree[2*node].size(); ++k){
+            for(int j = 0; j < tree[2*node+1].size(); ++j){
+                if (tree[2*node][k].value < tree[2*node+1][j].value){
+                    tree[2*node][k].largerNodes++;
+                    tree[2*node+1][j].lowerNodes++;
+                } 
+            }  
+        }
+
+
+        vector<Node> newVec;
+        newVec.reserve(tree[2*node].size() + tree[2*node+1].size() );
+        newVec = tree[2*node]; //left part
+        newVec.insert(newVec.end(),tree[2*node+1].begin(),tree[2*node+1].end()); //right part
+        tree[node].shrink_to_fit();
+        tree[node] = move(newVec);
+}
+
+
+
+/**
+ * Query tree to get triples within range [i, j]
+ */
+int query_tree(int node, int a, int b, int i, int j) {
+	
+	if(a > b || a > j || b < i) return -1; // Out of range
+
+	if(a >= i && b <= j){
+        int res = 0;
+        for(auto &e : tree[node]){
+            if(e.largerNodes != 0 && e.lowerNodes != 0){
+                res += e.largerNodes * e.lowerNodes;
+            }     
+        }
+        return res;
+    } // Current segment is totally within range [i, j]
+		
+
+	int q1 = query_tree(node*2, a, (a+b)/2, i, j); // Query left child
+	int q2 = query_tree(1+node*2, 1+(a+b)/2, b, i, j); // Query right child
+    
+	int res = q1 + q2; // Return final result
+	return res;
+}
+
+int main() {
+
+    cout << "insert N and then array values " << endl;
+    cin >> N;
+    vector<int> vec;
+    vec.reserve(N);
+
+    for(int i = 0;i<N;++i){
+        int tmp;
+        cin >> tmp;
+        vec.emplace_back(tmp);
+    }
+
+	build_tree(1, 0, N-1,vec);
+
+	cout << "number of triples = " <<  query_tree(1, 0, N-1, 0, N-1) << endl; // Get triples in range [0, N-1]
+}
