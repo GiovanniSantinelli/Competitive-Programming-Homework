@@ -118,7 +118,6 @@ std::vector<std::string> split(std::string str, char delimiter)
 int main()
 {
   std::ios_base::sync_with_stdio(false);
-    //ciao
   int N, Q;
   std::cin >> N;
   std::vector<int> V(N);
