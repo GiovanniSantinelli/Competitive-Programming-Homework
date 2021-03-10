@@ -1,0 +1,19 @@
+/*
+Scan all the elements and keep saving the Maximum Sum seen until that moment, if the sum becomes negative stop that sum. Complexity is O(n) since we just scan once 
+the entire array.
+*/
+
+int maxSubarraySum(int arr[], int n) {
+    int currSum, maxSum = 0;
+    for (int i = 0; i < n; i++) {
+        if (currSum + arr[i] >= 0) {
+            currSum += arr[i];
+            if (currSum > maxSum) maxSum = currSum;
+            continue;
+        } else {
+            if (currSum > maxSum) maxSum = currSum;
+            currSum = 0;
+        }
+    }
+    return maxSum > currSum ? maxSum : currSum;
+}
