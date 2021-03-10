@@ -2,6 +2,7 @@
 Create two arrays to precomputer the left highest bar and the right highest bar of each element. After this we can just traverse the entire array with elements and compute how much
 water we can store in that position. Complexity is O(N) since we make the pre-computation.
 */
+int trappingWater(int arr[], int n) {
     int left[n] = {0};
     int right[n] = {0};
     int maxL = 0, maxR = 0;
@@ -22,3 +23,4 @@ water we can store in that position. Complexity is O(N) since we make the pre-co
         if (tmp > 0) water += tmp;
     }
     return water;
+}
