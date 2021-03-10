@@ -1,0 +1,22 @@
+/*
+Create a bool vector of N positions, one for each element including the missing one and set elements to false as you see them. At the end only one element will be true since
+you never saw it. Complexity O(N) as we have to scan once the vector with elements.
+*/
+
+int MissingNumber(vector<int>& array, int n) {
+    vector<bool> bitVec(n, true);
+    int res = -1;
+
+    for (int i = 0; i < array.size(); i++) {
+        bitVec[array[i] - 1] = false;
+    }
+
+    for (int i = 0; i < bitVec.size(); i++) {
+        if (bitVec[i] == true) {
+            res = i + 1;
+            break;
+        }
+    }
+
+    return res;
+}
