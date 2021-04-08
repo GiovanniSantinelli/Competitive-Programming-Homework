@@ -1,0 +1,77 @@
+/*
+We use a map to store each element and how many times we have it in the current segment. Each time we want to insert a different element in the current segment, we fist check
+if it will still be a k-good segment, if yes we just add it and keep iterating otherwhise we first check the current segment with the longest found so far and we update it
+if nedeed. When we want to add a new element to the current segment overcoming the k limit, we just delete elemens from the beginning of the segment as long as we need to be able
+to add the new one like a rolling checksum, with a window that moves through the input.
+We iterate over the entire array just once and each element is inserted and deleted from the map at most once, so we have O(n) time complexity were n is the elements of the array.
+Space complexity is O(n) since store each element at most once.
+*/
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+pair<int, int> kGood(int arr[], int k, int dim) {
+    unordered_map<int, int> alreadySeen;
+    int tempLeft = 0, tempRight = 0, left = 0, right = 0, diff = 0, length = 0,
+        maximum = 0;
+    for (int i = 0; i < dim; i++) {
+        if (alreadySeen.find(arr[i]) == alreadySeen.end()) {
+            if (diff == k) {
+                if (maximum < length) {
+                    left = tempLeft;
+                    right = i - 1;
+                    maximum = length;
+                }
+
+                if (alreadySeen.find(arr[tempLeft])->second > 1) {
+                    while (diff == k) {
+                        if (alreadySeen.find(arr[tempLeft])->second > 1) {
+                            alreadySeen.find(arr[tempLeft])->second--;
+                            tempLeft++;
+                            length--;
+                        } else {
+                            alreadySeen.erase(arr[tempLeft]);
+                            diff--;
+                            tempLeft++;
+                            length--;
+                        }
+                    }
+                } else {
+                    alreadySeen.erase(arr[tempLeft]);
+                    diff--;
+                    tempLeft++;
+                    length--;
+                }
+            }
+            diff++;
+            alreadySeen.insert(make_pair(arr[i], 1));
+        } else {
+            alreadySeen.find(arr[i])->second++;
+        }
+        length++;
+        tempRight++;
+    }
+
+    //Check for last segment, that is when the longest segment right end is the last element of the array
+    if (left == 0 && right == 0 || maximum < length) {
+        left = tempLeft;
+        right = tempRight - 1;
+    }
+    return make_pair(left, right);
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    int dim = 0, k = 0;
+    scanf("%d %d", &dim, &k);
+    int arr[dim];
+    for (int i = 0; i < dim; ++i) {
+        scanf("%d", &arr[i]);
+    }
+    pair<int, int> res = kGood(arr, k, dim);
+    cout << res.first + 1 << " " << res.second + 1 << endl;
+    return 0;
+}
