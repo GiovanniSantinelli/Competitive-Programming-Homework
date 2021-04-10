@@ -1,0 +1,80 @@
+/*
+We use prefix sum techinque twice to solve this problem. First we check if the sum of all values is divisible by three, otherwhise we return 0. After that we compute the prefix
+sum from the end of the array to the front counting how many times we get the "one third" value (that is the sum of all the array, divided by three), let's call this the 
+suffixes array. Then we compute in the same way the prefix sum from the front to the end of the array and now each time we find a "one third" value we add to the result 
+the ith+2 value of the suffixes array, that is in how many ways we can split the rest of the array leaving a free position for the middle segment.
+Time complexity is O(n) where n is the number of elements, since we just have to iterate through all the array twice to compute the suffix and prefix arrays.
+Space complexity is O(n) since we have to store the prefix and suffix arrays.
+*/
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+int numOfWays(int arr[], int dim) {
+    long long int res = 0;
+    long long int tempSum = 0;
+    long long int tempRes = 1;
+    long long int oneThird = 0;
+    long long int suff[dim] = {0};
+    long long int pref[dim] = {0};
+
+    for (int i = 0; i < dim; i++) {
+        tempSum += arr[i];
+    }
+
+    if (tempSum % 3 != 0) {
+        cout << "0"
+             << "\n";
+        return 1;
+    }
+
+    oneThird = tempSum / 3;
+    tempSum = 0;
+
+    for (int i = dim - 1; i >= 0; i--) {
+        if (arr[i] + tempSum == oneThird) {
+            suff[i] = tempRes;
+            tempRes++;
+            tempSum += arr[i];
+        } else {
+            suff[i] = tempRes - 1;
+            tempSum += arr[i];
+        }
+    }
+
+    tempSum = 0;
+    tempRes = 1;
+    long long int val = 0;
+    for (int i = 0; i < dim; i++) {
+        if (arr[i] + tempSum == oneThird) {
+            pref[i] = tempRes;
+            tempRes++;
+            tempSum += arr[i];
+            if (i < dim - 2) {
+                res += suff[i + 2];
+                val++;
+            }
+        } else {
+            pref[i] = tempRes - 1;
+            tempSum += arr[i];
+        }
+    }
+
+    cout << res << endl;
+    return 0;
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    int dim = 0;
+    cin >> dim;
+    int arr[dim];
+    for (int i = 0; i < dim; i++) {
+        cin >> arr[i];
+    }
+    numOfWays(arr, dim);
+    return 0;
+}
