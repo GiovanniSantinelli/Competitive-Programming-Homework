@@ -1,0 +1,45 @@
+/*
+For each query we have a triple left, right, value. We have an array where for each query we put +value in the position left and 
+-value in the position right + 1. After that we compute the prefix sum of this array and we are ready to answer the queries by just
+returning the  position.
+Time complexity O(n) with n elements to make the prefix sum and O(n) space since we just store the prefix sum array. 
+*/
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    int t = 0;
+    cin >> t;
+    for (int j = 0; j < t; j++) {
+        int32_t n, u, q;
+        cin >> n >> u;
+        vector<int32_t> arr(n,0);
+        arr.reserve(n);
+        for (int32_t i = 0; i < u; i++) {
+            int32_t left, right, val;
+            cin >> left >> right >> val;
+            arr[left] += val;
+            if (right < n) arr[right + 1] -= val;
+        }
+
+        int32_t tmp = 0;
+        for (int32_t i = 0; i < n; i++) {
+            tmp += arr[i];
+            arr[i] = tmp;
+        }   
+
+        cin >> q;
+        for (int32_t i = 0; i < q; i++) {
+            int32_t tmpQ;
+            cin >> tmpQ;
+            cout << arr[tmpQ] << "\n";
+        }
+    }
+    return 0;
+}
