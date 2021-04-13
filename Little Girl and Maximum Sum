@@ -1,0 +1,48 @@
+/*
+First we calculate the frequency of each array position, to do this we interate through all the queries (l,r) and we add +1 at position
+l and -1 at position  r + 1. After this we do a prefix sum over these numbers and we'll have an array with the frequencies of every
+position. Now we order both the arrays, the one with the frequencies and the one with the original elements and we just have to
+multiply them since the ith element will occur a number of times that is the ith position in the frequencies array.
+Complexity is O(q + n) with q number of queries and n number of elements and to sort them it takes O(n log n).
+Space complexity is O(n) since we have to store only the frequencies array.
+*/
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+using namespace std;
+
+int main(int argc, char const *argv[])
+{
+    ios_base::sync_with_stdio(false);
+    int n, q;
+    cin >> n >> q;
+    vector<int64_t> elems;
+    elems.reserve(n);
+    for (int i = 0; i < n; i++)
+    {
+        int64_t e;
+        cin >> e;
+        elems.push_back(e);
+    }
+    vector<int> frequencies(n+1);
+    for (int i = 0; i < q; i++)
+    {
+        int l, r;
+        cin >> l >> r;
+        frequencies[l - 1] += 1;
+        frequencies[r] -= 1;
+    }
+    partial_sum(frequencies.begin(),frequencies.end(),frequencies.begin());
+    sort(elems.begin(),elems.end());
+    sort(frequencies.begin(),frequencies.end() - 1);
+    int64_t res = 0;
+    for (int i = 0; i < n; i++)
+    {
+        res += frequencies[i]*elems[i];
+    }
+    cout << res;
+    return 0;
+}
