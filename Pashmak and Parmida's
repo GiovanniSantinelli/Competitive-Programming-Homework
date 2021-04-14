@@ -7,6 +7,7 @@ Now we traverse v from left to right. When we are processing v[i] we can observe
 by using the counter vector. If f(1, i, v[i]) = k, we have to count the number of indices j such that f(j, n, v[i]) < k and this 
 is sum(k-i) on the fenwick tree, but actually to get the answer we have to consider only those indices j that are bigger than i, so we
  have to remove the values suffix_counter[1..i]. This is done step by step by subtracting 1 from B[suffix_counter[i]].
+ Time complexity is O(n log n).
 */
 
 #include <iostream>
