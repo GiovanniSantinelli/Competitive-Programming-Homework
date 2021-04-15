@@ -1,0 +1,180 @@
+/*
+First we remap the values in the range [0...2*n] where n is the number of segments. After that we add +1 to the segment tree at each left extreme position of each pair.
+Now we order the set of pairs by the right extreme in decreasing order and we start computing the sum query for each segment in this order. After each computation we delete that
+segment, that is we add -1 to the left extreme of that segment.
+Time complexity is O(n log n) while space complexity is O(n).
+*/
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <map>
+#include <vector>
+
+using namespace std;
+int64_t getMid(int64_t s, int64_t e) { return s + (e - s) / 2; }
+
+int64_t getSumUtil(int64_t *st, int64_t ss, int64_t se, int64_t qs, int64_t qe, int64_t si) {
+    if (qs <= ss && qe >= se) return st[si];
+    if (se < qs || ss > qe) return 0;
+    int64_t mid = getMid(ss, se);
+    return getSumUtil(st, ss, mid, qs, qe, 2 * si + 1) +
+           getSumUtil(st, mid + 1, se, qs, qe, 2 * si + 2);
+}
+
+void updateValueUtil(int64_t *st, int64_t ss, int64_t se, int64_t i, int64_t diff, int64_t si) {
+    if (i < ss || i > se) return;
+    st[si] = st[si] + diff;
+    if (se != ss) {
+        int64_t mid = getMid(ss, se);
+        updateValueUtil(st, ss, mid, i, diff, 2 * si + 1);
+        updateValueUtil(st, mid + 1, se, i, diff, 2 * si + 2);
+    }
+}
+
+void updateValue(int64_t arr[], int64_t *st, int64_t n, int64_t i, int64_t new_val) {
+    if (i < 0 || i > n - 1) {
+        cout << "Invalid Input";
+        return;
+    }
+    int diff = new_val - arr[i];
+    arr[i] = new_val;
+    updateValueUtil(st, 0, n - 1, i, diff, 0);
+}
+
+void updateRangeUtil(int tree[], int si, int ss, int se, int us, int ue,
+                     int diff) {
+    if (ss > se || ss > ue || se < us) return;
+    if (ss == se) {
+        tree[si] += diff;
+        return;
+    }
+
+    int mid = (ss + se) / 2;
+    updateRangeUtil(tree, si * 2 + 1, ss, mid, us, ue, diff);
+    updateRangeUtil(tree, si * 2 + 2, mid + 1, se, us, ue, diff);
+
+    tree[si] = tree[si * 2 + 1] + tree[si * 2 + 2];
+}
+
+int64_t getSum(int64_t *st, int64_t n, int64_t qs, int64_t qe) {
+    if (qs < 0 || qe > n - 1 || qs > qe) {
+        cout << "Invalid Input";
+        return -1;
+    }
+
+    return getSumUtil(st, 0, n - 1, qs, qe, 0);
+}
+
+int64_t constructSTUtil(int64_t arr[], int64_t ss, int64_t se, int64_t *st, int64_t si) {
+    if (ss == se) {
+        st[si] = arr[ss];
+        return arr[ss];
+    }
+    int64_t mid = getMid(ss, se);
+    st[si] = constructSTUtil(arr, ss, mid, st, si * 2 + 1) +
+             constructSTUtil(arr, mid + 1, se, st, si * 2 + 2);
+    return st[si];
+}
+
+int64_t *constructST(int64_t arr[], int64_t n) {
+    int64_t x = (int)(ceil(log2(n)));
+
+    int64_t max_size = 2 * (int)pow(2, x) - 1;
+
+    int64_t *st = new int64_t[max_size];
+
+    constructSTUtil(arr, 0, n - 1, st, 0);
+
+    return st;
+}
+
+bool sortbysec(const pair<int64_t, int64_t> &a, const pair<int64_t, int64_t> &b) {
+    return (a.second > b.second);
+}
+
+bool sortbysecInc(const pair<int64_t, int64_t> &a, const pair<int64_t, int64_t> &b) {
+    return (a.second < b.second);
+}
+
+bool sortbyFir(const pair<int64_t, int64_t> &a, const pair<int64_t, int64_t> &b) {
+    return (a.first < b.first);
+}
+
+void nestedSegments(vector<pair<int64_t, int64_t>> &pairs, int n) {
+    vector<pair<int64_t, int64_t>> remap = pairs;
+    int64_t tmpFir = INT64_MIN;
+    int64_t tmpFirVal = INT64_MIN;
+
+    //Remapping left values in the range [0..n]
+    sort(remap.begin(),remap.end(),sortbyFir);
+    for(int i = 0; i < n; i++){
+        if(remap[i].first == tmpFir){
+            remap[i].first = tmpFirVal;
+        }else{
+            tmpFir = remap[i].first;
+            remap[i].first = i;
+            tmpFirVal = i;
+        }
+    }
+    
+    //Remapping right values in the range [n..2*n]
+    sort(remap.begin(),remap.end(),sortbysecInc);
+    for(int i = 0; i < n; i++){
+        remap[i].second = i+n;
+    }
+    
+    //Finding the maximum value to then create the array of correct size;
+    int64_t max = 0;
+    for (int i = 0; i < n; i++) {
+        if(remap[i].second > max) max = remap[i].second ;
+    }
+    max++;
+
+    //Creating the segment tree and adding 1 to each left extreme of each pair.
+    int64_t tmp[max] = {0};
+    int64_t *segTree = constructST(tmp, max);
+    for (int i = 0; i < n; i++) {
+        updateValueUtil(segTree, 0, max - 1, remap[i].first, 1, 0);
+    }
+
+    //Sorting pairs by right extreme
+    vector<pair<int64_t, int64_t>> sortedPairs = remap;
+    sort(sortedPairs.begin(), sortedPairs.end(), sortbysec);
+
+    //Keeping the original order in a map, this will be used at the end to print the results.
+    map<int64_t,int64_t> order;
+    for(int i = 0; i < n; i++){
+        order.insert(make_pair(pairs[i].second,0));
+    }
+
+    //Calculating the range sum of each segment and storing it in the results map;
+    auto it = order.rbegin();
+    for (int i = 0; i < n; i++) {
+        it->second = getSum(segTree, max, sortedPairs[i].first, sortedPairs[i].second) - 1;
+        it++;
+        updateValueUtil(segTree, 0, max - 1, sortedPairs[i].first, -1, 0);
+    }
+
+    for(int i = 0; i < n; i++){
+        cout << order.find(pairs[i].second)->second << "\n";
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    int n;
+    int64_t max = 0, min = 0;
+    cin >> n;
+    vector<pair<int64_t, int64_t>> pairs (n);
+    pairs.reserve(n);
+    for (int i = 0; i < n; i++) {
+        int64_t tmp1 = 0, tmp2 = 0;
+        cin >> tmp1 >> tmp2;
+        if (tmp2 > max) max = tmp2;
+        if (tmp1 < min) min = tmp1;
+        pairs[i].first = tmp1;
+        pairs[i].second = tmp2;
+    }
+    nestedSegments(pairs, n);
+}
