@@ -1,0 +1,24 @@
+/*
+We use DP to fill a matrix with sum/2+1 rows and N+1 elements, where N is the size of the input array, and sum is the sum of all the array elements.
+For each cell of the matrix we have the property that : matrix[i][j] = true if a subset of {arr[0], arr[1], ..arr[j-1]} has sum equal to i, otherwise false. Doing this we 
+can find if we have a subset that sum up to sum/2, that means our answer is true.
+Time and space complexity is O(sum*N);
+*/
+int equalPartition(int N, int arr[]) {
+    int sum = 0;
+    int i, j;
+    for (i = 0; i < N; i++) sum += arr[i];
+    if (sum % 2 != 0) return false;
+    bool part[sum / 2 + 1][N + 1];
+    for (i = 0; i <= N; i++) part[0][i] = true;
+    for (i = 1; i <= sum / 2; i++) part[i][0] = false;
+
+    for (i = 1; i <= sum / 2; i++) {
+        for (j = 1; j <= N; j++) {
+            part[i][j] = part[i][j - 1]; //Before we could
+            if (i >= arr[j - 1])
+                part[i][j] = part[i][j] || part[i - arr[j - 1]][j - 1]; //or we could before we added the last element, subtracting it.
+        }
+    }
+    return part[sum / 2][N];
+}
