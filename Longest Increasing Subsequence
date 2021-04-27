@@ -1,0 +1,17 @@
+/*
+We exploit the concept of dominant positions. Given positions i and j we say that i dominates j if LIS(i) > LIS(j) and i < j where LIS(i) is the longest increasing 
+subsequence up to position i. Our answer is the number of dominant positions and we can store them in a set, so we scan the array and update the set so that it keeps only 
+dominant positions, at the end the size of the set is our answer.
+Time complexity is O(n*log n) if we use a BST to implement the set.
+Space complexity is O(n) to store the set.
+*/
+
+int longestSubsequence(int n, int a[]){
+    set<int> curr;
+    for(int i = 0; i < n ; i++){
+        auto it = curr.lower_bound(a[i]);
+        if(it != curr.end()) curr.erase(it);
+        curr.insert(a[i]);
+   }
+   return curr.size();
+}
