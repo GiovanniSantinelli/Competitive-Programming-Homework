@@ -1,0 +1,31 @@
+/*
+At each step we compute the sum of the longest increasing subsequence and the longest decreasing subsequence up to position i, and the solution will be the maximum 
+value between all the sums computed.
+For the longest increasing subsequence we reuse the solution used to solve "Longest Increasing Subsequence" problem while for the longest decreasing subsequence, 
+we can observe that it corresponds to the longest increasing subsequence but scanning the array from right to left.
+Time complexity is O(n*log n) while space complexity is O(n).
+*/
+
+int LongestBitonicSequence(vector<int>nums)
+	{
+	    int n = nums.size();
+	    vector<int> lis(n);
+	    vector<int> lds(n);
+	    set<int> curr;
+	    for(int i = 0; i < n; i++){
+	        auto e = curr.lower_bound(nums[i]);
+	        if (e != curr.end()) curr.erase(e);
+	        curr.insert(nums[i]);
+	        lis[i] = curr.size();
+	    }
+	    curr.clear();
+	    for(int i = n-1; i >= 0; i--){
+	        auto e = curr.lower_bound(nums[i]);
+	        if (e != curr.end()) curr.erase(e);
+	        curr.insert(nums[i]);
+	        lds[i] = curr.size();
+	    }
+	    int sol = 0;
+	    for(int i = 0; i < n; i++) sol = max(sol, lis[i] + lds[i] - 1);
+	    return sol;
+	}
