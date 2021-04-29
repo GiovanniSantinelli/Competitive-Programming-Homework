@@ -1,0 +1,22 @@
+/*
+Given two strings s and t, we create a |s+1| * |t+1| matrix where the +1 represent the empty character. Then first of all we fill the first row and first column respectively with
+[0..|t|] and [0..|s|] since each cell represent the edit distance between the empty character and the string.
+Then the problem can be solved selecting the value in the diagonal if the characters we are comparing are the same, while if they aren't we pick the minimum between the values 
+in cells [i-1][j-1], [i][j-1], [i-1][j], and we add +1 since we'll need one more operation. The final result will be in the last cell in the bottom right corner.
+Time and space complexity is O(|s|*|t|) where s and t are the two strings.
+*/
+
+int editDistance(string s1, string s2) {
+    int matrix[s1.size() + 1][s2.size() + 1] = {};
+    for (int i = 0; i < s1.size() + 1; i++) matrix[i][0] = i;
+    for (int i = 0; i < s2.size() + 1; i++) matrix[0][i] = i;
+
+    for (int i = 1; i < s1.size() + 1; i++) {
+        for (int j = 1; j < s2.size() + 1; j++) {
+            s1[i - 1] == s2[j - 1]
+                ? matrix[i][j] = matrix[i - 1][j - 1]
+                : matrix[i][j] = min({matrix[i][j - 1], matrix[i - 1][j], matrix[i - 1][j - 1]}) + 1;
+        }
+    }
+    return matrix[s1.size()][s2.size()];
+};
