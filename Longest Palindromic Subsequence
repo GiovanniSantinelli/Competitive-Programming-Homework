@@ -1,0 +1,29 @@
+/*
+The problem can be imagined as the Longest common subsequence between a string and it's reverse. We used the same approach previously used to solve LCS.
+Time complexity is O(|s|*|s|).
+*/
+
+int longestPalinSubseq (string S)
+{   
+    string s1 = S, s2 = S;
+    reverse(s2.begin(),s2.end());
+    int x = S.size(), y = S.size();
+    int matrix[x + 1][y + 1] = {0};
+    for (int i = 1; i < x + 1; i++) {
+        matrix[i][0] = 0;
+    }
+    for (int i = 1; i < y + 1; i++) {
+        matrix[0][i] = 0;
+    }
+
+    for (int i = 1; i < x + 1; i++) {
+        for (int j = 1; j < y + 1; j++) {
+            if (s1[i - 1] == s2[j - 1]) {
+                matrix[i][j] = matrix[i - 1][j - 1] + 1;
+            } else {
+                matrix[i][j] = max(matrix[i - 1][j], matrix[i][j - 1]);
+            }
+        }
+    }
+    return matrix[x][y];
+}
