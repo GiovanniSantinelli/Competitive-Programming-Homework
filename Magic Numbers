@@ -1,0 +1,37 @@
+/*
+Scan the entire string from the beginning and check each time if the current substring is one of the accepted ones, if yes skip the characters and continue otherwhise end.
+Time complexity is O(n) where n is the length of the string.
+*/
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <set>
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
+void magicNumber(string n) {
+    bool res = true;
+    for (int i = 0; i < n.size(); i++) {
+        if (n[i] == '1' && n[i + 1] == '4' && n[i + 2] == '4') {
+            i += 2;
+        } else if (n[i] == '1' && n[i + 1] == '4') {
+            i++;
+        } else if (n[i] == '1') {
+            continue;
+        } else {
+            res = false;
+            break;
+        }
+    }
+    res == true ? cout << "YES" : cout << "NO";
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    string n;
+    cin >> n;
+    magicNumber(n);
+    return 0;
+}
