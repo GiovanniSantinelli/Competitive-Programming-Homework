@@ -1,0 +1,24 @@
+/*
+Greedy approach that takes into account the fact that for all the possible flips combinations we can only have a +2 besides the length of the alternating subsequence.
+We can also have a +1 when we have only one pair ('00' or '11'), that is the result will be the alternating subsequence + 1 (that is the original n).
+Time complexity O(n) to scan the array.
+*/
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <set>
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    int64_t n, res;
+    string vec;
+    cin >> n >> vec;
+    for (int i = 1; i < n; i++) if (vec[i] != vec[i-1]) res++;
+    cout << min(n,res+2) << "\n";
+    return 0;
+}
